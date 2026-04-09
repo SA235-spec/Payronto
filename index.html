@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TrustWork — Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #0F6E56;
+    --green-light: #E1F5EE;
+    --green-mid: #1D9E75;
+    --green-dark: #085041;
+    --text: #1a1a1a;
+    --text-muted: #6b7280;
+    --border: rgba(0,0,0,0.1);
+    --bg: #f8f7f4;
+    --white: #ffffff;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .shell {
+    width: 100%;
+    max-width: 460px;
+    background: var(--white);
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.08);
+  }
+
+  /* Top brand bar */
+  .brand-bar {
+    background: var(--green);
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand-logo {
+    font-family: 'DM Serif Display', serif;
+    color: #fff;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .brand-logo svg { opacity: 0.9; }
+  .no-scam-pill {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    padding: 16px 28px 0;
+    background: var(--white);
+  }
+  .progress-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 6px;
+  }
+  .step-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 1;
+  }
+  .step-dot.active { border-color: var(--green); background: var(--green); color: #fff; }
+  .step-dot.done { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .step-line {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+  .step-line.done { background: var(--green); }
+  .step-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    padding: 0 2px;
+  }
+  .step-labels span.active-label { color: var(--green); font-weight: 500; }
+
+  /* Content area */
+  .content {
+    padding: 24px 28px 28px;
+  }
+
+  .screen { display: none; animation: fadeUp 0.3s ease; }
+  .screen.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .screen-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .screen-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+
+  /* Role picker */
+  .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .role-card {
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .role-card:hover { border-color: var(--green-mid); }
+  .role-card.selected { border-color: var(--green); background: var(--green-light); }
+  .role-icon { font-size: 28px; margin-bottom: 10px; }
+  .role-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .role-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+  .role-card.selected .role-name { color: var(--green-dark); }
+
+  /* Form elements */
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .form-input, .form-select {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--green);
+  }
+  .form-input::placeholder { color: #c0c0c0; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* Upload zone */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-sm);
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg);
+  }
+  .upload-zone:hover { border-color: var(--green); background: var(--green-light); }
+  .upload-icon { font-size: 24px; margin-bottom: 8px; }
+  .upload-label { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .upload-sub { font-size: 11px; color: var(--text-muted); }
+  .upload-done { display: none; align-items: center; gap: 8px; justify-content: center; }
+  .upload-done span { font-size: 13px; color: var(--green); font-weight: 500; }
+
+  /* OTP boxes */
+  .otp-row { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
+  .otp-box {
+    width: 48px; height: 56px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 22px;
+    font-weight: 500;
+    text-align: center;
+    font-family: 'DM Serif Display', serif;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color 0.2s;
+  }
+  .otp-box:focus { outline: none; border-color: var(--green); }
+
+  /* Skill tags */
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .skill-tag {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-muted);
+    background: var(--white);
+  }
+  .skill-tag.selected { background: var(--green); color: #fff; border-color: var(--green); }
+  .skill-tag:hover:not(.selected) { border-color: var(--green-mid); color: var(--text); }
+
+  /* Trust badge */
+  .trust-box {
+    background: var(--green-light);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: var(--green-dark);
+    line-height: 1.6;
+  }
+  .trust-box-icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+
+  /* Checklist */
+  .checklist { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    font-size: 13px;
+    color: var(--text);
+  }
+  .check-item svg { flex-shrink: 0; }
+
+  /* Success screen */
+  .success-wrap { text-align: center; padding: 20px 0; }
+  .success-circle {
+    width: 80px; height: 80px;
+    background: var(--green-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 36px;
+  }
+  .success-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .success-sub { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 24px; }
+  .perks { display: flex; flex-direction: column; gap: 8px; text-align: left; margin-bottom: 24px; }
+  .perk { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text); }
+  .perk-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+  /* Buttons */
+  .btn-primary {
+    width: 100%;
+    padding: 13px;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn-primary:hover { background: var(--green-dark); }
+  .btn-primary:disabled { background: #a0cfc5; cursor: not-allowed; }
+  .btn-secondary {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--text-muted); color: var(--text); }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 4px; }
+  .btn-row .btn-back {
+    width: 44px; flex-shrink: 0;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-row .btn-back:hover { border-color: var(--text-muted); }
+  .btn-row .btn-primary { flex: 1; }
+
+  .resend-link { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+  .resend-link a { color: var(--green); cursor: pointer; text-decoration: none; }
+
+  /* Bottom helper */
+  .bottom-note { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 14px; }
+  .bottom-note a { color: var(--green); text-decoration: none; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="brand-bar">
+    <div class="brand-logo">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M10 2L3 6v4c0 4.4 2.9 8.5 7 9.9 4.1-1.4 7-5.5 7-9.9V6L10 2z" fill="rgba(255,255,255,0.2)" stroke="#fff" stroke-width="1.5"/>
+        <path d="M7 10l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      TrustWork
+    </div>
+    <span class="no-scam-pill">No Scam Zone</span>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-steps" id="progress-steps"></div>
+    <div class="step-labels" id="step-labels"></div>
+  </div>
+
+  <div class="content">
+
+    <!-- SCREEN 0: Role selection -->
+    <div class="screen active" id="screen-0">
+      <div class="screen-title">Welcome to TrustWork</div>
+      <div class="screen-sub">Safe jobs. Secure payments. No scams. How will you be using the platform?</div>
+      <div class="role-grid">
+        <div class="role-card" id="role-worker" onclick="selectRole('worker')">
+          <div class="role-icon">💼</div>
+          <div class="role-name">I'm a Worker</div>
+          <div class="role-desc">Find jobs and get paid safely via escrow</div>
+        </div>
+        <div class="role-card" id="role-hirer" onclick="selectRole('hirer')">
+          <div class="role-icon">🏢</div>
+          <div class="role-name">I'm a Hirer</div>
+          <div class="role-desc">Post jobs and hire verified talent</div>
+        </div>
+      </div>
+      <button class="btn-primary" id="role-btn" disabled onclick="next()">Continue →</button>
+      <div class="bottom-note">Already have an account? <a>Sign in</a></div>
+    </div>
+
+    <!-- SCREEN 1: Basic info -->
+    <div class="screen" id="screen-1">
+      <div class="screen-title">Your basic info</div>
+      <div class="screen-sub">Let's get you set up. This takes about 3 minutes.</div>
+      <div class="form-group">
+        <label class="form-label">Full name</label>
+        <input class="form-input" placeholder="e.g. Adeola Okonkwo" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input class="form-input" type="email" placeholder="you@example.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone number</label>
+        <input class="form-input" type="tel" placeholder="+234 800 000 0000" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" placeholder="At least 8 characters" />
+      </div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="prev()">←</button>
+        <button class="btn-primary" onclick="next()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: Phone OTP -->
+    <div class="screen" id="screen-2">
+      <div class="screen-title">Verify your phone</div>
+      <div class="screen-sub">We sent a 6-digit code to +234 800 *** ****. Enter it below to confirm your number.</div>
+      <div class="trust-box">
+        <span class="trust-box-icon">🔒</span>
+        Phone verification prevents fake accounts and protects everyone on the platform.
+      </div>
+      <div class="otp-row">
+        <input class="otp-box" maxlength="1" oninput="otpNext(this,0)" />
+        <input class="otp-box" maxlength="1" oninput="otpNext(this,1)" />
+        <input class="otp-box" maxlength="1" oninput="otpNext(this,2)" />
+        <input class="otp-box" maxlength="1" oninput="otpNext(this,3)" />
+        <input class="otp-box" maxlength="1" oninput="otpNext(this,4)" />
+        <input class="otp-box" maxlength="1" oninput="otpNext(this,5)" />
+      </div>
+      <div class="resend-link">Didn't get it? <a onclick="simulateResend()">Resend code</a></div>
+      <div class="btn-row" style="margin-top:20px;">
+        <button class="btn-back" onclick="prev()">←</button>
+        <button class="btn-primary" onclick="next()">Verify & Continue →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 3a: Worker — skills -->
+    <div class="screen" id="screen-3-worker">
+      <div class="screen-title">What do you do?</div>
+      <div class="screen-sub">Pick your main skills so hirers can find you. Choose up to 5.</div>
+      <div class="skill-tags">
+        <span class="skill-tag" onclick="toggleSkill(this)">Web Development</span>
+        <span class="skill-tag" onclick="toggleSkill(this)">Mobile Apps</span>
+        <span class="skill-tag" onclick="toggleSkill(this)">UI/UX Design</span>
+        <span class="skill-tag" onclick="toggleSkill(this)">Graphic Design</span>
+        <span class="skill-tag" onclick="toggleSkill(this)">Content Writing</span>
+        <span class="skill-tag" onclick="toggleSkill(this)">Copywriting</span>
+        <span class="skill-tag" onclick="toggleSkill(this)">Social Media</span>
+        <span class="skill-tag" onclick="toggleSkill(this)">SEO / Marketing</span>
+        <span class="skill-tag" onclick="toggleSkill(this)">Data Analysis</span>
+        <span class="skill-tag" onclick="toggleSkill(this)">Video Editing</span>
+        <span class="skill-tag" onclick="toggleSkill(this)">Animation</span>
+        <span class="skill-tag" onclick="toggleSkill(this)">Virtual Assistant</span>
+        <span class="skill-tag" onclick="toggleSkill(this)">Finance / Accounting</span>
+        <span class="skill-tag" onclick="toggleSkill(this)">Photography</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hourly rate (₦)</label>
+        <input class="form-input" placeholder="e.g. 5000" />
+      </div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="prev()">←</button>
+        <button class="btn-primary" onclick="next()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 3b: Hirer — business info -->
+    <div class="screen" id="screen-3-hirer">
+      <div class="screen-title">Your business</div>
+      <div class="screen-sub">Help workers trust you. Verified hirers get 3× more applicants.</div>
+      <div class="form-group">
+        <label class="form-label">Business / Company name</label>
+        <input class="form-input" placeholder="e.g. Kolade Foods Ltd" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">CAC number</label>
+          <input class="form-input" placeholder="RC000000" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Industry</label>
+          <select class="form-select">
+            <option value="">Select...</option>
+            <option>Technology</option>
+            <option>Finance</option>
+            <option>Retail / E-commerce</option>
+            <option>Media / Creative</option>
+            <option>Food & Beverage</option>
+            <option>Healthcare</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Company website (optional)</label>
+        <input class="form-input" placeholder="https://yourcompany.com" />
+      </div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="prev()">←</button>
+        <button class="btn-primary" onclick="next()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: ID upload -->
+    <div class="screen" id="screen-4">
+      <div class="screen-title">Verify your identity</div>
+      <div class="screen-sub">Upload a government-issued ID. Reviewed within 2 hours. This is what makes TrustWork a no-scam zone.</div>
+      <div class="form-group">
+        <label class="form-label">ID type</label>
+        <select class="form-select">
+          <option>National ID (NIN slip)</option>
+          <option>International Passport</option>
+          <option>Driver's Licence</option>
+          <option>Voter's Card</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="upload-zone" onclick="simulateUpload(this)" id="upload-id">
+          <div class="upload-prompt">
+            <div class="upload-icon">📄</div>
+            <div class="upload-label">Tap to upload ID photo</div>
+            <div class="upload-sub">JPG, PNG or PDF · max 5MB</div>
+          </div>
+          <div class="upload-done" id="upload-done-id">
+            <span>✅</span>
+            <span>NIN_slip.jpg uploaded</span>
+          </div>
+        </div>
+      </div>
+      <div class="trust-box">
+        <span class="trust-box-icon">🛡</span>
+        Your ID is encrypted and only used for verification. It is never shared with hirers or workers.
+      </div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="prev()">←</button>
+        <button class="btn-primary" onclick="next()">Submit for Review →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 5: Bank account -->
+    <div class="screen" id="screen-5">
+      <div class="screen-title" id="bank-title">Link your bank account</div>
+      <div class="screen-sub" id="bank-sub">This is where your payments will be sent after escrow is released.</div>
+      <div class="form-group">
+        <label class="form-label">Bank name</label>
+        <select class="form-select">
+          <option>Access Bank</option>
+          <option>GTBank</option>
+          <option>First Bank</option>
+          <option>Zenith Bank</option>
+          <option>UBA</option>
+          <option>Kuda Bank</option>
+          <option>OPay</option>
+          <option>Moniepoint</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Account number</label>
+        <input class="form-input" placeholder="10-digit account number" maxlength="10" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Account name (auto-filled)</label>
+        <input class="form-input" placeholder="Will auto-fill after verification" style="color:#aaa;" readonly />
+      </div>
+      <div class="trust-box">
+        <span class="trust-box-icon">🔒</span>
+        Powered by Paystack. Your bank details are encrypted end-to-end and never stored on TrustWork servers.
+      </div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="prev()">←</button>
+        <button class="btn-primary" onclick="next()">Link Account →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 6: Success -->
+    <div class="screen" id="screen-6">
+      <div class="success-wrap">
+        <div class="success-circle">🎉</div>
+        <div class="success-title" id="success-title">You're in!</div>
+        <div class="success-sub" id="success-sub">Your account is being reviewed. You'll get a confirmation SMS within 2 hours. Here's what happens next:</div>
+        <div class="perks" id="success-perks"></div>
+        <button class="btn-primary" onclick="alert('Redirecting to dashboard...')">Go to my dashboard →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let role = null;
+  let currentScreen = 0;
+
+  const workerFlow = [0, 1, 2, '3-worker', 4, 5, 6];
+  const hirerFlow  = [0, 1, 2, '3-hirer', 4, 5, 6];
+
+  const stepNames = ['Role', 'Details', 'Verify', 'Profile', 'ID Check', 'Payment', 'Done'];
+
+  function getFlow() { return role === 'hirer' ? hirerFlow : workerFlow; }
+
+  function renderProgress() {
+    const steps = document.getElementById('progress-steps');
+    const labels = document.getElementById('step-labels');
+    const flow = getFlow();
+    let html = '';
+    let lhtml = '';
+    flow.forEach((s, i) => {
+      const isDone = i < currentScreen;
+      const isActive = i === currentScreen;
+      const cls = isDone ? 'done' : isActive ? 'active' : '';
+      html += `<div class="step-dot ${cls}">${isDone ? '✓' : i + 1}</div>`;
+      if (i < flow.length - 1) html += `<div class="step-line ${isDone ? 'done' : ''}"></div>`;
+      lhtml += `<span class="${isActive ? 'active-label' : ''}">${stepNames[i]}</span>`;
+    });
+    steps.innerHTML = html;
+    labels.innerHTML = lhtml;
+  }
+
+  function showScreen(idx) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const flow = getFlow();
+    const screenId = 'screen-' + flow[idx];
+    const el = document.getElementById(screenId);
+    if (el) el.classList.add('active');
+    renderProgress();
+  }
+
+  function next() {
+    const flow = getFlow();
+    if (currentScreen < flow.length - 1) {
+      currentScreen++;
+      showScreen(currentScreen);
+      if (flow[currentScreen] === 6) setupSuccess();
+    }
+  }
+
+  function prev() {
+    if (currentScreen > 0) {
+      currentScreen--;
+      showScreen(currentScreen);
+    }
+  }
+
+  function selectRole(r) {
+    role = r;
+    document.getElementById('role-worker').classList.toggle('selected', r === 'worker');
+    document.getElementById('role-hirer').classList.toggle('selected', r === 'hirer');
+    document.getElementById('role-btn').disabled = false;
+
+    if (r === 'hirer') {
+      document.getElementById('bank-title').textContent = 'Fund your escrow wallet';
+      document.getElementById('bank-sub').textContent = 'Link the account you\'ll use to fund job escrows. Money is held safely until you approve work.';
+    }
+  }
+
+  function toggleSkill(el) {
+    const selected = document.querySelectorAll('.skill-tag.selected');
+    if (el.classList.contains('selected')) {
+      el.classList.remove('selected');
+    } else if (selected.length < 5) {
+      el.classList.add('selected');
+    }
+  }
+
+  function otpNext(el, idx) {
+    const boxes = document.querySelectorAll('.otp-box');
+    if (el.value.length === 1 && idx < 5) boxes[idx + 1].focus();
+  }
+
+  function simulateUpload(zone) {
+    setTimeout(() => {
+      zone.querySelector('.upload-prompt') && (zone.querySelector('.upload-prompt').style.display = 'none');
+      const done = document.getElementById('upload-done-id');
+      done.style.display = 'flex';
+      zone.style.background = '#E1F5EE';
+      zone.style.borderColor = '#0F6E56';
+      zone.style.borderStyle = 'solid';
+    }, 600);
+  }
+
+  function simulateResend() {
+    alert('A new code has been sent to your phone.');
+  }
+
+  function setupSuccess() {
+    if (role === 'worker') {
+      document.getElementById('success-title').textContent = 'Welcome to TrustWork!';
+      document.getElementById('success-sub').textContent = 'Your profile is under review. You\'ll get an SMS within 2 hours. Here\'s what to expect:';
+      document.getElementById('success-perks').innerHTML = `
+        <div class="perk"><div class="perk-dot"></div>ID verification completes within 2 hours</div>
+        <div class="perk"><div class="perk-dot"></div>Browse & apply to jobs immediately</div>
+        <div class="perk"><div class="perk-dot"></div>Payments always held in escrow — you're protected</div>
+        <div class="perk"><div class="perk-dot"></div>Build your rating with your first job</div>
+      `;
+    } else {
+      document.getElementById('success-title').textContent = 'You\'re verified!';
+      document.getElementById('success-sub').textContent = 'Your hirer account is being reviewed. You can start posting jobs in under 2 hours.';
+      document.getElementById('success-perks').innerHTML = `
+        <div class="perk"><div class="perk-dot"></div>Business verification completes within 2 hours</div>
+        <div class="perk"><div class="perk-dot"></div>Post your first job and reach verified talent</div>
+        <div class="perk"><div class="perk-dot"></div>Fund escrow only when you\'re ready to hire</div>
+        <div class="perk"><div class="perk-dot"></div>Dispute mediation available 24/7</div>
+      `;
+    }
+  }
+
+  renderProgress();
+</script>
+</body>
+</html>
